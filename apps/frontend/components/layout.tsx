@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { ReactNode } from "react";
-import { useAuthLogout, useAuthUser } from "../hooks/query/auth";
+import { useAuthLogout, useAuthUser } from "../hooks/queries/auth";
 import { useRouter } from "next/router";
 
 interface LayoutProps {
@@ -9,27 +8,44 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { data } = useAuthUser();
+  const { data, isFetched } = useAuthUser();
   const { mutateAsync } = useAuthLogout();
   const useRoute = useRouter();
 
   async function onLogout() {
     await mutateAsync();
-    useRoute.push("/login");
+    useRoute.push("/auth/login");
   }
   return (
-    <>
-      {data?.user ? (
-        <div>
-          {data.user} <button onClick={onLogout}>Logout</button>
+    <div className="flex flex-col h-screen pt-12">
+      {isFetched && (
+        <div className="fixed inset-0 top-0 flex justify-between p-4 h-fit">
+          <h1>
+            <Link href={"/"}> PriceNow Casino </Link>
+          </h1>
+          {data?.user ? (
+            <div className="flex items-center gap-2">
+              <Link className="btn btn-sm btn-ghost" href={"/account"}>
+                {data.user.email} ({data.user.account.balance}$)
+              </Link>
+              <button className="btn btn-sm btn-ghost" onClick={onLogout}>
+                Logout
+              </button>
+            </div>
+          ) : (
+            <nav className="flex gap-1">
+              <Link className="btn btn-sm btn-outline" href={"/auth/login"}>
+                Login
+              </Link>
+              <Link className="btn btn-sm btn-ghost" href={"/auth/signup"}>
+                Signup
+              </Link>
+            </nav>
+          )}
         </div>
-      ) : (
-        <nav>
-          <Link href={"/auth/signup"}>Signup</Link> <Link href={"/auth/login"}>Login</Link>
-        </nav>
       )}
-      <main>{children}</main>
-    </>
+      <main className="flex-grow p-4">{children}</main>
+    </div>
   );
 };
 

@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import express from "express";
-import passport from "passport";
 import { useSessionStrategy } from "./modules/auth/strategies/auth.strategy.session";
 import { useLocalStrategy } from "./modules/auth/strategies/auth.strategy.local";
 import { useAuthRoutes } from "./modules/auth/auth.routes";

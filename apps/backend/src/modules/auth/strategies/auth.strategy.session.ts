@@ -23,22 +23,26 @@ export function useSessionStrategy(app: Express, prisma: PrismaClient) {
     }),
   });
 
-  passport.deserializeUser(deserializeUser);
-  passport.serializeUser(serializeUser);
+  passport.deserializeUser(deserializeUser(prisma));
+  passport.serializeUser(serializeUser(prisma));
 
   app.use(sess);
   app.use(passport.initialize());
   app.use(passport.session());
 }
 
-function serializeUser(user: Express.User, done: (e: any, id?: unknown) => void) {
-  process.nextTick(() => {
-    done(null, user);
-  });
+function serializeUser(prisma: PrismaClient) {
+  return async (user: any, done: (e: any, user?: Express.User) => void) => {
+    process.nextTick(() => {
+      done(null, user);
+    });
+  };
 }
 
-function deserializeUser(id: Express.User, done: (e: any, user?: Express.User) => void) {
-  process.nextTick(() => {
-    done(null, id);
-  });
+function deserializeUser(prisma: PrismaClient) {
+  return async (email: string, done: (e: any, user?: Express.User) => void) => {
+    process.nextTick(() => {
+      done(null, email);
+    });
+  };
 }

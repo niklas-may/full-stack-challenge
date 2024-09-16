@@ -24,7 +24,7 @@ export function useAuthRoutes(app: Express, prisma: PrismaClient) {
         res.status(400).json({ message: "User already exists" });
         return;
       }
-      const newUser = await prisma.user.create({
+      await prisma.user.create({
         data: {
           email: req.body.email,
           account: {

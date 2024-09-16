@@ -1,6 +1,6 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { QueryClient, QueryClientProvider, useQuery, HydrationBoundary } from "@tanstack/react-query";
+import { QueryClientProvider, HydrationBoundary } from "@tanstack/react-query";
 import { useState } from "react";
 import Layout from "../components/layout";
 import { queryClient } from "../lib/query-client";

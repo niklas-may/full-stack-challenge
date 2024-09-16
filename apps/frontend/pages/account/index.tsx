@@ -1,14 +1,14 @@
 import type { NextPage } from "next";
 import { useAuthGuard } from "../../hooks/guards/auth";
 
-const Game: NextPage = () => {
-  useAuthGuard()
+const Account: NextPage = () => {
+  useAuthGuard();
 
   return (
     <div>
-      <main>Game</main>
+      <main>Account</main>
     </div>
   );
 };
 
-export default Game;
+export default Account;
