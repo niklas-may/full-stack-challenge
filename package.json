@@ -1,0 +1,12 @@
+{
+  "name": "full-stack-challenge",
+  "version": "1.0.0",
+  "description": "",
+  "packageManager": "pnpm@9.10.0",
+  "scripts": {
+    "clean": "pnpm dlx rimraf --glob ./**/node_modules"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1"
+  }
+}
