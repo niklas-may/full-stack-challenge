@@ -3,8 +3,10 @@ import passport from "passport";
 import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient } from "@prisma/client";
+import { DepenceyInjection } from "../../../lib/dependency-injection";
+import { AuthUser } from "../utils/request-user";
 
-export function useSessionStrategy(app: Express, prisma: PrismaClient) {
+export function useSessionStrategy(app: Express, di: DepenceyInjection) {
   const sess = session({
     name: "full-stack-chalenge:auth",
     secret: "your-secret-key", // TODO: replace
@@ -17,14 +19,14 @@ export function useSessionStrategy(app: Express, prisma: PrismaClient) {
       path: "/",
       sameSite: "lax",
     },
-    store: new PrismaSessionStore(prisma, {
+    store: new PrismaSessionStore(di.db, {
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),
   });
 
-  passport.deserializeUser(deserializeUser(prisma));
-  passport.serializeUser(serializeUser(prisma));
+  passport.deserializeUser(deserializeUser(di.db));
+  passport.serializeUser(serializeUser(di.db));
 
   app.use(sess);
   app.use(passport.initialize());
@@ -34,15 +36,16 @@ export function useSessionStrategy(app: Express, prisma: PrismaClient) {
 function serializeUser(prisma: PrismaClient) {
   return async (user: any, done: (e: any, user?: Express.User) => void) => {
     process.nextTick(() => {
+
       done(null, user);
     });
   };
 }
 
 function deserializeUser(prisma: PrismaClient) {
-  return async (email: string, done: (e: any, user?: Express.User) => void) => {
-    process.nextTick(() => {
-      done(null, email);
+  return async (authUser: AuthUser, done: (e: any, user?: Express.User) => void) => {
+    process.nextTick(async () => {
+      done(null, authUser);
     });
   };
 }

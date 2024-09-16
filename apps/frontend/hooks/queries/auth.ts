@@ -1,8 +1,7 @@
 import { type AuthUser } from "./auth.types";
 import { queryOptions, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { client } from "../../lib/client";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
+import { accountOption } from "./account";
 
 export const authUserOptions = queryOptions({
   queryKey: ["auth-user"],
@@ -52,14 +51,14 @@ export const useAuthLogout = () => {
       return await client("/auth/logout");
     },
     onSuccess: () => {
-      queryClient.setQueryData(authUserOptions.queryKey, {});
+      queryClient.resetQueries({ queryKey: authUserOptions.queryKey });
+      queryClient.resetQueries({queryKey: accountOption.queryKey})
     },
   });
 };
 
-export const useAuthUser = () => useQuery({
-  ...authUserOptions,
-  retry: false,
-
-});
-
+export const useAuthUser = () =>
+  useQuery({
+    ...authUserOptions,
+    retry: false,
+  });

@@ -1,11 +1,14 @@
 import { Express } from "express";
+import { DepenceyInjection } from "../../lib/dependency-injection";
+import { AuthService } from "./auth.service";
 import { localGuard } from "./guards/auth.guard.local";
 import { sessionGuard } from "./guards/auth.gurad.session";
-import { PrismaClient } from "@prisma/client";
-import { body } from "express-validator";
 import { validateRequest } from "../../lib/validate-request";
+import { body } from "express-validator";
 
-export function useAuthRoutes(app: Express, prisma: PrismaClient) {
+export function useAuthModule(app: Express, di: DepenceyInjection) {
+  const service = new AuthService(di.db);
+
   app.post("/auth/login", localGuard, (req: any, res: any, next: any) => {
     res.status(200).json(req.session.passport);
   });
@@ -19,21 +22,12 @@ export function useAuthRoutes(app: Express, prisma: PrismaClient) {
     "/auth/signup",
     validateRequest([body("email").isEmail(), body("password").isString()]),
     async (req: any, res: any, next: any) => {
-      const user = await prisma.user.findUnique({ where: { email: req.body.email } });
+      const user = await service.findUserByEmail(req.body.email);
       if (user) {
         res.status(400).json({ message: "User already exists" });
         return;
       }
-      await prisma.user.create({
-        data: {
-          email: req.body.email,
-          account: {
-            create: {
-              balance: 10,
-            },
-          },
-        },
-      });
+      await service.createUser(req.body.email);
       res.status(200).json({});
     }
   );

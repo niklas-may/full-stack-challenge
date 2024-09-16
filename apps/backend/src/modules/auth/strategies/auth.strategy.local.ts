@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import { DepenceyInjection } from "../../../lib/dependency-injection";
 
-export function useLocalStrategy(prisma: PrismaClient) {
+export function useLocalStrategy(di: DepenceyInjection) {
   const strategy = new LocalStrategy(
     {
       usernameField: "email",
@@ -10,36 +10,32 @@ export function useLocalStrategy(prisma: PrismaClient) {
       passReqToCallback: true,
     },
     async (req, email, password, done) => {
-      const user = await prisma.user.findUnique({
+      const user = await di.db.user.findUnique({
         where: {
           email,
-        },
-        include: {
-          account: true,
         },
       });
 
       if (!user) {
         return done(null, false);
       }
-      const updatedUser = await prisma.user.update({
+
+      const updateUser = await di.db.user.update({
         where: {
           id: user.id,
         },
         data: {
           account: {
             update: {
-              balance: 10,
+              balance: {
+                set: 10,
+              },
             },
           },
-
         },
-        include: {
-          account: true,
-        }
       });
 
-      return done(null, updatedUser);
+      return done(null, updateUser);
     }
   );
 
