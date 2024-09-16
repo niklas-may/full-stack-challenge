@@ -10,6 +10,13 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt   DateTime
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique

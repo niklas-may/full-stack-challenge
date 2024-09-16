@@ -1,37 +1,22 @@
-import { PrismaClient } from '@prisma/client'
-import cors from 'cors'
-import express from 'express'
+import { PrismaClient } from "@prisma/client";
+import cors from "cors";
+import express from "express";
+import passport from "passport";
+import { useSessionStrategy } from "./modules/auth/strategies/auth.strategy.session";
+import { useLocalStrategy } from "./modules/auth/strategies/auth.strategy.local";
+import { useAuthRoutes } from "./modules/auth/auth.routes";
+import { useGameRoutes } from "./modules/game/game.routes";
 
-const prisma = new PrismaClient()
-const app = express()
+const prisma = new PrismaClient();
 
-app.use(express.json())
-app.use(cors())
+const app = express();
+app.use(express.json());
+app.use(cors({ origin: "http://localhost:3000", methods: "GET,HEAD,PUT,PATCH,POST,DELETE", credentials: true }));
 
-app.post(`/roll`, async (req, res) => {
-  // initiate a new roll
-})
+useLocalStrategy(prisma);
+useSessionStrategy(app, prisma);
 
-app.post(`/cashout`, async (req, res) => {
-  // initiate a cashout
-})
+useAuthRoutes(app, prisma);
+useGameRoutes(app, prisma);
 
-app.get(`/accounts/:id`, async (req, res) => {
-  const result = await prisma.account.findFirst({
-    where: {
-      id: req.params.id,
-    },
-  })
-  res.json(result)
-})
-
-app.post(`/accounts`, async (req, res) => {
-  const result = await prisma.account.create({
-    data: {
-      ...req.body,
-    },
-  })
-  res.status(201).json(result)
-})
-
-export default app
+export default app;
