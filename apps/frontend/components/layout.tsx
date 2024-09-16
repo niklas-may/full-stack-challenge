@@ -12,11 +12,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { data, isFetched } = useAuthUser();
   const { data: accountData, isFetched: isAccountFetched } = useAccount();
   const { mutateAsync } = useAuthLogout();
-  const useRoute = useRouter();
 
   async function onLogout() {
     await mutateAsync();
-    useRoute.push("/auth/login");
   }
 
   return (

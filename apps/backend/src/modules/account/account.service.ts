@@ -24,4 +24,33 @@ export class AccountService {
       },
     });
   }
+
+  async getBalance(authUser: AuthUser) {
+    const { account } = await this.db.user.findUniqueOrThrow({
+      where: {
+        id: authUser.id,
+      },
+      select: {
+        account: {
+          select: {
+            balance: true,
+          },
+        },
+      },
+    });
+    return account.balance;
+  }
+
+  async cashout(authUser: AuthUser) {
+    await this.db.account.update({
+      where: {
+        id: authUser.accountId,
+      },
+      data: {
+        balance: {
+          set: 0,
+        },
+      },
+    });
+  }
 }

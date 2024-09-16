@@ -20,6 +20,12 @@ export function useAccountModule(app: Express, di: DepenceyInjection) {
   });
 
   app.get(`/account/cashout`, sessionGuard, async (req, res) => {
-    // initiate a cashout
+    const balance = await service.getBalance(requestUser(req));
+
+    if (balance <= 0) {
+      return res.status(400).json({ message: "Insufficient balance" });
+    }
+    await service.cashout(requestUser(req));
+    res.status(200).json({});
   });
 }

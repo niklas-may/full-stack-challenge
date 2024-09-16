@@ -31,7 +31,7 @@ const Game: NextPage = () => {
           Roll
         </button>
         <div
-          className={classNames("mt-4 text-xs text-center", [
+          className={classNames("mt-4 text-xs flex justify-center", [
             (isError || (data && data?.balance <= 0)) && "alert alert-error",
           ])}
         >

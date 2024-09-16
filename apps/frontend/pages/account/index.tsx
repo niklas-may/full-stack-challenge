@@ -1,12 +1,20 @@
 import type { NextPage } from "next";
 import { useAuthGuard } from "../../hooks/guards/auth";
 import { useAccount, useAccountCashout, useAccountDeposit } from "../../hooks/queries/account";
+import { useEffect, useState } from "react";
 
 const Account: NextPage = () => {
   useAuthGuard();
   const deposit = useAccountDeposit();
   const cashout = useAccountCashout();
   const account = useAccount();
+
+  const [hasBalance, setHasBalance] = useState(false);
+
+  useEffect(() => {
+    const has = account.data?.balance && account.data?.balance > 0 ? true : false;
+    setHasBalance(has);
+  }, [account.data]);
 
   return (
     <div className="flex items-center justify-center h-full ">
@@ -18,9 +26,9 @@ const Account: NextPage = () => {
           <button
             className="w-full mt-4 btn"
             onClick={() => cashout.mutate()}
-            disabled={!!account.data?.balance && account.data?.balance < 0}
+            disabled={!hasBalance}
           >
-            Cashout 
+            Cashout
           </button>
         </div>
       </div>
