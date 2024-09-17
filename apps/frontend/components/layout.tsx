@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { useAuthLogout, useAuthUser } from "../hooks/queries/auth";
-import { useRouter } from "next/router";
 import { useAccount } from "../hooks/queries/account";
 
 interface LayoutProps {

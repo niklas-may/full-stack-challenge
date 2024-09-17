@@ -4,6 +4,7 @@ import { QueryClientProvider, HydrationBoundary } from "@tanstack/react-query";
 import { useState } from "react";
 import Layout from "../components/layout";
 import { queryClient } from "../lib/query-client";
+import { useAuthUser } from "../hooks/queries/auth";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [client] = useState(queryClient);

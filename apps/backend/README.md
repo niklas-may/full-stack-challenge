@@ -7,6 +7,12 @@ Initialize database and client.
 pnpm db:init
 ```
 
+# Test
+
+```bash
+pnpm test 
+```
+
 # Develop
 
 ```bash

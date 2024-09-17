@@ -2,7 +2,7 @@
 
 ## Installation
 
-Use pnpm as the package manager. Run first install from the root.
+Use pnpm as the package manager. Check `.nvmrc` for correct node vesion or run `nvm use`. Run first install from the root.
 
 ```bash
 pnpm install

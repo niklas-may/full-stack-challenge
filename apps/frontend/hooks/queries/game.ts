@@ -14,6 +14,7 @@ export const useGameRoll = () => {
       const previousData = queryClient.getQueryData<GameRoll>(accountOption.queryKey)!;
       const newData = { ...previousData, ...data };
       queryClient.setQueryData(accountOption.queryKey, newData);
+
       return data;
     },
   });

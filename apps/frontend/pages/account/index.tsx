@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import { useAuthGuard } from "../../hooks/guards/auth";
 import { useAccount, useAccountCashout, useAccountDeposit } from "../../hooks/queries/account";
 import { useEffect, useState } from "react";
+import { TrickyButton } from "../../components/TrickyButton";
 
 const Account: NextPage = () => {
   useAuthGuard();
@@ -23,13 +24,15 @@ const Account: NextPage = () => {
           <button className="w-full mt-4 btn btn-primary" onClick={() => deposit.mutate()}>
             Add 10$
           </button>
-          <button
-            className="w-full mt-4 btn"
+          <TrickyButton
+            size="md"
+            type="button"
+            classes="w-full mt-4 btn"
             onClick={() => cashout.mutate()}
             disabled={!hasBalance}
           >
             Cashout
-          </button>
+          </TrickyButton>
         </div>
       </div>
     </div>

@@ -1,30 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 import { AuthUser } from "../auth/utils/request-user";
 
-enum Face {
+export enum Face {
   Lemon = "lemon",
   Cherry = "cherry",
   Orange = "orange",
   Watermelon = "watermelon",
 }
 
-const FACES: Face[] = [Face.Cherry, Face.Lemon, Face.Orange, Face.Watermelon];
-const REWARDS: Record<Face, number> = {
-  [Face.Cherry]: 10,
-  [Face.Lemon]: 20,
-  [Face.Orange]: 30,
-  [Face.Watermelon]: 40,
-};
-
 type RollResult = {
   faces: Face[];
   balance: number;
-  won: boolean
+  won: boolean;
 };
 
 export class GameService {
-  private readonly FACES = FACES;
-  private readonly REWARDS = REWARDS;
+  readonly FACES: Face[] = [Face.Cherry, Face.Lemon, Face.Orange, Face.Watermelon];
 
   constructor(public db: PrismaClient) {}
 
@@ -32,51 +23,67 @@ export class GameService {
     const result: RollResult = {
       faces: this.roll(),
       balance,
-      won: false
+      won: false,
     };
 
-    // result.faces = [Face.Cherry, Face.Cherry, Face.Cherry, Face.Cherry];
     const winningSymbol = this.won(result);
     result.won = !!winningSymbol;
 
-    if (result.won && (await this.shouldRetry(authUser))) {
-      return this.rollDice(authUser,  balance);
+    if (result.won && (await this.shouldRetry(balance))) {
+      return this.rollDice(authUser, balance);
     }
 
-    const rewared = winningSymbol ? REWARDS[winningSymbol] : 0;
+    const rewared = this.getReward(winningSymbol);
     result.balance = await this.updateBalance(authUser, rewared);
 
     return result;
   }
 
-  private roll() {
+  getReward(face: Face | null) {
+    if (face === null) return 0;
+
+    const REWARDS: Record<Face, number> = {
+      [Face.Cherry]: 10,
+      [Face.Lemon]: 20,
+      [Face.Orange]: 30,
+      [Face.Watermelon]: 40,
+    };
+
+    return REWARDS[face];
+  }
+
+  roll() {
     const result = [];
 
     for (const _ of this.FACES) {
-      const face = this.FACES[Math.floor(Math.random() * this.FACES.length + 0)];
+      const face = this.getRandomFace();
       result.push(face);
     }
 
     return result;
   }
 
-  private won({ faces }: RollResult) {
+  getRandomFace() {
+    const res = Math.floor(Math.random() * this.FACES.length);
+    return this.FACES[res];
+  }
+
+  won({ faces }: RollResult) {
     const same = faces.every((face) => face === faces[0]);
     const result = same ? faces[0] : null;
     return result;
   }
 
-  private async shouldRetry(authUser: AuthUser) {
-    const user = await this.db.user.findUniqueOrThrow({
-      where: {
-        id: authUser.id,
-      },
-      include: {
-        account: true,
-      },
-    });
-    const { balance } = user.account;
+  async shouldRetry(currentBalance: number) {
+    const balance = currentBalance - 1;
+    const retryThreshold = this.getRetryThreshold(balance);
+    const rand = Math.random();
+    const retry = rand < retryThreshold;
 
+    return retry;
+  }
+
+  getRetryThreshold(balance: number) {
     let retryThreshold = 0;
 
     if (balance >= 40 && balance < 60) {
@@ -87,9 +94,7 @@ export class GameService {
       retryThreshold = 0.6;
     }
 
-    const retry = Math.random() < retryThreshold;
-
-    return retry;
+    return retryThreshold
   }
 
   async updateBalance(authUser: AuthUser, reward: number) {
