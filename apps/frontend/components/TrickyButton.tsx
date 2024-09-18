@@ -58,16 +58,15 @@ export const TrickyButton: React.FC<TrickyButtonProps> = ({
     "btn-outline": variant === "outline",
   });
   return (
-    <div ref={ref}>
-      <button
-        className={className}
-        type={type}
-        onClick={() => onClick()}
-        disabled={disabled || isDisabled}
-        style={{ transform: translate }}
-      >
-        {children}
-      </button>
-    </div>
+    <button
+      className={className}
+      type={type}
+      onClick={() => onClick()}
+      disabled={disabled}
+      style={{ transform: translate }}
+      ref={ref}
+    >
+      {children}
+    </button>
   );
 };
