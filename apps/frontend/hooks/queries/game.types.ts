@@ -1,7 +1,9 @@
 export interface GameRoll {
-  faces: Face[];
+  result: Face[];
+  isWin: boolean;
+  winningFace: Face | null;
+  reward: number;
   balance: number;
-  won: boolean
 }
 
 export enum Face {

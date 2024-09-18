@@ -12,7 +12,7 @@ export const useGameRoll = () => {
     },
     onSuccess: (data) => {
       const previousData = queryClient.getQueryData<GameRoll>(accountOption.queryKey)!;
-      const newData = { ...previousData, ...data };
+      const newData = { ...previousData, balance: data.balance };
       queryClient.setQueryData(accountOption.queryKey, newData);
 
       return data;
