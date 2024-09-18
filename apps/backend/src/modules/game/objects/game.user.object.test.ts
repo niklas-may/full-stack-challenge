@@ -1,7 +1,7 @@
 import { userDataStub } from "../__test__/stubs/user-data-stub";
 import { GameUser } from "./game.user.object";
 
-describe("[GameUser]", () => {
+describe("GameUser", () => {
   const balanceMap: { balance: number; chance: number }[] = [
     { balance: 30, chance: 0 },
     { balance: 40, chance: 0.3 },
