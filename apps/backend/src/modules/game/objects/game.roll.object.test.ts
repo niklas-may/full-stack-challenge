@@ -25,10 +25,10 @@ describe("GameRoll", () => {
   });
 
   it("Should identify the winning face", () => {
-    for (const { mathRandom } of faceMap) {
+    for (const { mathRandom, face } of faceMap) {
       jest.spyOn(Math, "random").mockImplementation(() => mathRandom);
       const game = new GameRoll();
-      expect(game.winningFace).toMatch(faceMap[i].face);
+      expect(game.winningFace).toMatch(face);
     }
   });
 

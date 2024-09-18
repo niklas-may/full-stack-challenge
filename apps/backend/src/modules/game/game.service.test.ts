@@ -29,7 +29,7 @@ describe("GameService", () => {
       userData.account.balance = balance;
       const user = new GameUser(userData);
 
-      jest.spyOn(service["db"].user, "update");
+      jest.spyOn(service["db"].user, "update").mockImplementation( () => ({account: {balance: 10}}) as any);
 
       const expectedArgs = {
         where: {

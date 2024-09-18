@@ -16,8 +16,8 @@ describe("Account Module", () => {
   });
 
   afterAll(async () => {
-    server.close();
     await client.cleanup();
+    server.close();
   });
 
   it("Should return balance", async () => {

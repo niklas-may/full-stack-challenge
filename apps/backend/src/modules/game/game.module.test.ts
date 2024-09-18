@@ -9,6 +9,8 @@ describe("Game Module", () => {
   let client: E2eClient;
   let server: ReturnType<typeof app.listen>;
 
+
+
   beforeAll(async () => {
     const port = await portfinder.getPortPromise();
     server = app.listen(port);
@@ -16,8 +18,8 @@ describe("Game Module", () => {
   });
 
   afterAll(async () => {
-    server.close();
     await client.cleanup();
+    server.close();
   });
 
   it("Should win eventually", async () => {

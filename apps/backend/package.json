@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev src/index.ts",
     "dev:test": "jest --watch",
-    "test": "jest --verbose",
+    "test": "jest --runInBand --verbose",
     "build": "tsc",
     "db:init": "npx prisma db push"
   },

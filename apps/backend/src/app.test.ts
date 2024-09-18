@@ -16,8 +16,8 @@ describe("App", () => {
   });
 
   afterAll(async () => {
-    server.close();
     await client.cleanup();
+    server.close();
   });
 
   it("Should fail on protected routes", async () => {
