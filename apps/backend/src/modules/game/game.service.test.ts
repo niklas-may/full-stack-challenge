@@ -1,91 +1,56 @@
-import { PrismaClient } from "@prisma/client";
-import { Face, GameService } from "./game.service";
+import { GameService } from "./game.service";
+import { Face, GameRoll } from "./objects/game.roll.object";
+import { GameUser } from "./objects/game.user.object";
+import { userDataStub } from "./__test__/stubs/user-data-stub";
+import { mockPrisma } from "./__test__/mocks/prisma-mock";
 
-function createMockPrisma() {
-  return {
-    user: {
-      findUniqueOrThrow: jest.fn(),
-      update: jest.fn(),
-    },
-  } as unknown as PrismaClient;
-}
+describe("GameService", () => {
+  it("Should update Balance correctly", async () => {
+    const service = new GameService(mockPrisma());
 
-describe("[GameModule]", () => {
-  describe("Service:", () => {
-    it("Should return all faces randomly", async () => {
-      const db = createMockPrisma();
-      const service = new GameService(db);
+    const cases = [
+      {
+        result: [Face.Cherry, Face.Cherry, Face.Cherry, Face.Watermelon],
+        balance: 10,
+        balanceUpdate: -1,
+      },
+      {
+        result: [Face.Cherry, Face.Cherry, Face.Cherry, Face.Cherry],
+        balance: 10,
+        balanceUpdate: 9,
+      },
+    ];
 
-      const cases: { rand: number; face: string }[] = [
-        { rand: 0, face: service.FACES[0] },
-        { rand: 0.25, face: service.FACES[1] },
-        { rand: 0.5, face: service.FACES[2] },
-        { rand: 0.75, face: service.FACES[3] },
-      ];
+    for (const { result, balance, balanceUpdate } of cases) {
+      const game = new GameRoll();
+      game.result = result;
 
-      for (const { rand, face } of cases) {
-        jest.spyOn(Math, "random").mockImplementation(() => rand);
-        expect(service.getRandomFace()).toBe(face);
-      }
-    });
+      const userData = userDataStub();
+      userData.account.balance = balance;
+      const user = new GameUser(userData);
 
-    it("Should find a winning roll", () => {
-      const db = createMockPrisma();
-      const service = new GameService(db);
+      jest.spyOn(service["db"].user, "update").mockImplementation( () => ({account: {balance: 10}}) as any);
 
-      const cases: { faces: Face[]; expected: null | Face }[] = [
-        { faces: service.FACES.map((f) => f), expected: null },
-        { faces: service.FACES.map((f) => service.FACES[0]), expected: service.FACES[0] },
-      ];
-
-      for (const { faces, expected } of cases) {
-        const result = {
-          faces,
-          balance: 10,
-          won: false,
-        };
-        expect(service.won(result)).toBe(expected);
-      }
-    });
-
-    it("Should retrun the correct reward", () => {
-      const db = createMockPrisma();
-      const service = new GameService(db);
-
-      const cases: { face: Face; reward: number }[] = [
-        { face: Face.Cherry, reward: 10 },
-        { face: Face.Lemon, reward: 20 },
-        { face: Face.Orange, reward: 30 },
-        { face: Face.Watermelon, reward: 40 },
-      ];
-
-      for (const { face, reward } of cases) {
-        expect(service.getReward(face)).toBe(reward);
-      }
-    });
-
-    it("Should create correct retry chance based on balance", async () => {
-      const db = createMockPrisma();
-      const service = new GameService(db);
-
-      const cases: { balance: number; retryThreshold: number }[] = [
-        {
-          balance: 30,
-          retryThreshold: 0,
+      const expectedArgs = {
+        where: {
+          id: user.data.id,
         },
-        {
-          balance: 40,
-          retryThreshold: 0.3,
+        data: {
+          account: {
+            update: {
+              balance: {
+                increment: balanceUpdate,
+              },
+            },
+          },
         },
-        {
-          balance: 60,
-          retryThreshold: 0.6,
+        include: {
+          account: true,
         },
-      ];
+      };
 
-      for (const { balance, retryThreshold } of cases) {
-        expect(service.getRetryThreshold(balance)).toBe(retryThreshold);
-      }
-    });
+      service.roll(game, user);
+      expect(service["db"].user.update).toHaveBeenCalledWith(expectedArgs);
+    }
   });
 });

@@ -18,7 +18,7 @@ const Game: NextPage = () => {
   const [canRoll, setCanRoll] = useState(true);
 
   useEffect(() => {
-    if (data?.faces) setFaces(data.faces);
+    if (data?.result) setFaces(data.result);
     if (account.isFetched) {
       setCanRoll(!!account.data?.balance);
       setIsRolling(false);
@@ -37,7 +37,7 @@ const Game: NextPage = () => {
       <div className="w-full">
         <div
           className={classNames("grid flex-grow grid-cols-4 h-36 overflow-hidden rounded-lg border", [
-            data?.won && "bg-green-900",
+            data?.isWin && "bg-green-900",
           ])}
         >
           {faces.map((face, index) => (
